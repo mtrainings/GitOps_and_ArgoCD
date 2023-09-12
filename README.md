@@ -10,7 +10,7 @@
 * [Create application from CLI](LAB/Create_application_from_CLI.md)
 * [Create application from UI](LAB/Create_application_from_UI.md)
 * [HELM](LAB/HELM.md)
-* [(Directory of files)](LAB/Directory_of_files.md)
+* [Directory of files](LAB/Directory_of_files.md)
 * [Kustomize](LAB/Kustomize.md)
 * [Create projects](LAB/Create_projects.md)
 * [Create projects with role](LAB/Create_projects_with_role.md)
