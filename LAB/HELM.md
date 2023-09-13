@@ -25,7 +25,7 @@ spec:
 ```
 2. Apply this manifest with kubectl
 ```
-kubectl apply -f app.yaml -n argocd
+kubectl apply -f helm-app.yaml -n argocd
 ```
 3. Verify app
 ```
@@ -62,7 +62,7 @@ spec:
 ```
 7. Apply this manifest with kubectl
 ```
-kubectl apply -f app.yaml -n argocd
+kubectl apply -f helm-app.yaml -n argocd
 ```
 5. Verify app
 ```
