@@ -17,5 +17,3 @@
 * [Use private git repo using https/ssh](LAB/Private_git_repo.md)
 * [Tracking strategies Git tag/Git SHA](LAB/Tracking_strategies.md)
 * [Diff customization](LAB/Diff_customization.md)
-* [Hooks resources](LAB/Hooks_resources.md)
-* [Sync Wavews](LAB/Sync_Wavews.md)
