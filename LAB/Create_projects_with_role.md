@@ -35,7 +35,7 @@ spec:
 ```
 2. Apply this manifest with kubectl
 ```
-kubectl apply -f project.yaml -n argocd
+kubectl apply -f project-with-role.yaml -n argocd
 ```
 3. Verify if project are deployed in ArgoCD
 ```
