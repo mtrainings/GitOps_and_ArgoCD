@@ -75,7 +75,7 @@ metadata:
     argocd.argoproj.io/secret-type: repository
 stringData:
   type: git
-  url: https://spy8681@bitbucket.org/spy8681/argocd-example-apps.git
+  url: bitbucket.org:spy8681/argocd-example-apps.git
   sshPrivateKey: |
     -----BEGIN OPENSSH PRIVATE KEY-----
      # private key goes here
@@ -116,7 +116,7 @@ spec:
   project: default
   source: 
     path: guestbook
-    repoURL: https://spy8681@bitbucket.org/spy8681/argocd-example-apps.git
+    repoURL: bitbucket.org:spy8681/argocd-example-apps.git
     targetRevision: master
   syncPolicy:
     syncOptions:
