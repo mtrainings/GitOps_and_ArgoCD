@@ -5,7 +5,7 @@
 ## Content
 * [Install ArgoCD](LAB/Install_ArgoCD_.md)
 * [Access to ArgoCD server via UI](LAB/Access_to_ArgoCD_server_via_UI.md)
-* [Install ArgoCD CLI](LAB/Create_application_from_CLI.md)
+* [Install ArgoCD CLI](LAB/Install_ArgoCD_CLI.md)
 * [Create application declaratively with yaml](LAB/Create_application_declaratively_with_yaml.md)
 * [Create application from CLI](LAB/Create_application_from_CLI.md)
 * [Create application from UI](LAB/Create_application_from_UI.md)
