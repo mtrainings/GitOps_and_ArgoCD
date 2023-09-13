@@ -18,7 +18,7 @@ spec:
   source:
     path: guestbook
     repoURL: "https://github.com/spy86/argocd-example-apps.git"
-    targetRevision: v1
+    targetRevision: pre-post-sync-v0.2
     directory:
       recurse: true
   syncPolicy:
