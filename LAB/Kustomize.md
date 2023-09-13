@@ -23,7 +23,7 @@ spec:
 ```
 2. Apply this manifest with kubectl
 ```
-kubectl apply -f app.yaml -n argocd
+kubectl apply -f kustomize.yaml -n argocd
 ```
 3. Verify app
 ```
@@ -61,7 +61,7 @@ spec:
 ```
 7. Apply this manifest with kubectl
 ```
-kubectl apply -f app.yaml -n argocd
+kubectl apply -f kustomize.yaml -n argocd
 ```
 8. Verify app
 ```
