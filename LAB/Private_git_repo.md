@@ -10,7 +10,7 @@ metadata:
     argocd.argoproj.io/secret-type: repository
 stringData:
   type: git
-  url: SET_YOUR_PRIVATE_URL_HTTPS_FORMAT
+  url: https://spy8681@bitbucket.org/spy8681/argocd-example-apps.git
   password: <PAT-TOKEN>
   username: my-token
 ```
@@ -49,7 +49,7 @@ spec:
   project: default
   source: 
     path: guestbook
-    repoURL: "SET_YOUR_PRIVATE_URL_HTTPS_FORMAT"
+    repoURL: https://spy8681@bitbucket.org/spy8681/argocd-example-apps.git
     targetRevision: master
   syncPolicy:
     syncOptions:
@@ -75,7 +75,7 @@ metadata:
     argocd.argoproj.io/secret-type: repository
 stringData:
   type: git
-  url: SET_YOUR_PRIVATE_URL_HTTPS_FORMAT
+  url: https://spy8681@bitbucket.org/spy8681/argocd-example-apps.git
   sshPrivateKey: |
     -----BEGIN OPENSSH PRIVATE KEY-----
      # private key goes here
@@ -116,7 +116,7 @@ spec:
   project: default
   source: 
     path: guestbook
-    repoURL: "SET_YOUR_PRIVATE_URL_SSH_FORMAT"
+    repoURL: https://spy8681@bitbucket.org/spy8681/argocd-example-apps.git
     targetRevision: master
   syncPolicy:
     syncOptions:
