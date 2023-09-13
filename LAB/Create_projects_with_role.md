@@ -50,9 +50,3 @@ argocd proj role create-token project-with-role ci-role --grpc-web
 argocd app delete demo --grpc-web --auth-token TOKEN_VALUE
 ```
 📓 Deleting should be denied because the roles does not grant delete permission
-
-6. Try to sync the application using the token
-```
-argocd app sync demo --grpc-web --auth-token TOKEN_VALUE
-```
-📓 Sync should work because role has the sync permission
