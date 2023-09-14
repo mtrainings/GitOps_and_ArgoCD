@@ -10,7 +10,7 @@ metadata:
     argocd.argoproj.io/secret-type: repository
 stringData:
   type: git
-  url: https://spy8681@bitbucket.org/spy8681/argocd-example-apps.git
+  url: https://dev.azure.com/mtrainings/ArgoCD/_git/argocd-example-apps
   password: <PAT-TOKEN>
   username: my-token
 ```
@@ -49,7 +49,7 @@ spec:
   project: default
   source: 
     path: guestbook
-    repoURL: https://spy8681@bitbucket.org/spy8681/argocd-example-apps.git
+    repoURL: https://dev.azure.com/mtrainings/ArgoCD/_git/argocd-example-apps
     targetRevision: master
   syncPolicy:
     syncOptions:
@@ -75,7 +75,7 @@ metadata:
     argocd.argoproj.io/secret-type: repository
 stringData:
   type: git
-  url: bitbucket.org:spy8681/argocd-example-apps.git
+  url: git@ssh.dev.azure.com:v3/mtrainings/ArgoCD/argocd-example-apps
   sshPrivateKey: |
     -----BEGIN OPENSSH PRIVATE KEY-----
      # private key goes here
@@ -116,7 +116,7 @@ spec:
   project: default
   source: 
     path: guestbook
-    repoURL: bitbucket.org:spy8681/argocd-example-apps.git
+    repoURL: git@ssh.dev.azure.com:v3/mtrainings/ArgoCD/argocd-example-apps
     targetRevision: master
   syncPolicy:
     syncOptions:
