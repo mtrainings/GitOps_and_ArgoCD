@@ -1,5 +1,8 @@
 # Kustomize
 
+<details>
+<summary><b>Solution</b></summary>
+<p>
 ## 1. Create an Argo CD Application Declaratively with the Following Specifications
 
 **Example Manifest:**
@@ -84,3 +87,6 @@ kubectl get application -n argocd
 ```
 
 ## Go to UI and Click Re-Sync the Application and Select prune Option to Delete Old Resources with Old Names
+
+</p>
+</details>

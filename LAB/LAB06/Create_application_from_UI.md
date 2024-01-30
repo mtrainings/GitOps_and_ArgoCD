@@ -1,5 +1,8 @@
 # Creating Argo CD Application from UI
 
+<details>
+<summary><b>Solution</b></summary>
+<p>
 ## 1. Create an Argo CD application using the Web UI by clicking the `New App` button
 
    **Specification:**
@@ -12,3 +15,6 @@
 - Source branch: `master`
 - Destination cluster URL: `https://kubernetes.default.svc`
 - Destination namespace: `app-1`
+
+</p>
+</details>

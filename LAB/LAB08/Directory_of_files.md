@@ -1,5 +1,8 @@
 # Directory of Files Options
 
+<details>
+<summary><b>Solution</b></summary>
+<p>
 ## 1. Create an Argo CD Application Declaratively Using YAML
 
 **Example Manifest:**
@@ -82,3 +85,6 @@ kubectl get application -n argocd
 ```
 
 ## Go to UI and Re-Sync the Application
+
+</p>
+</details>

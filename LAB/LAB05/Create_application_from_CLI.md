@@ -1,5 +1,8 @@
 # Creating Argo CD Application from CLI
 
+<details>
+<summary><b>Solution</b></summary>
+<p>
 ## 1. Forward port for ArgoCD
 
 ```bash
@@ -35,3 +38,6 @@ argocd app sync app-2 --grpc-web
 ```bash
 argocd app list --grpc-web
 ```
+
+</p>
+</details>

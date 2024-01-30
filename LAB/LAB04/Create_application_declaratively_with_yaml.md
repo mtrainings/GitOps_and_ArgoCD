@@ -1,5 +1,9 @@
 # Creating Argo CD Application Declaratively
 
+<details>
+<summary><b>Solution</b></summary>
+<p>
+
 ## 1. Create an Argo CD application declaratively using YAML
 
 **Example manifest:**
@@ -44,3 +48,6 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 ```
 
 ## 5. Now log in to the UI and click Sync
+
+</p>
+</details>

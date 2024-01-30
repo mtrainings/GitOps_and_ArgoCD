@@ -1,5 +1,8 @@
 # HELM in ArgoCD
 
+<details>
+<summary><b>Solution</b></summary>
+<p>
 ## 1. Create an Argo CD Application Declaratively Using YAML
 
 **Example Manifest:**
@@ -82,3 +85,6 @@ kubectl get application -n argocd
 ```
 
 ## 9. Go to UI and Re-Sync the Application and Select `prune` Option to Delete Old Resources with Old Names
+
+</p>
+</details>

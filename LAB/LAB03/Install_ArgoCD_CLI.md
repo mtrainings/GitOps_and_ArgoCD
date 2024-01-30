@@ -1,5 +1,8 @@
 # Installing Argo CD CLI
 
+<details>
+<summary><b>Solution</b></summary>
+<p>
 ## 1. Install Argo CD CLI using the following commands
 
 ```bash
@@ -30,3 +33,6 @@ argocd login 127.0.0.1:8080
 ```bash
 argocd cluster list --grpc-web
 ```
+
+</p>
+</details>

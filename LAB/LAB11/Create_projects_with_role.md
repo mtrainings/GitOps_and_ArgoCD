@@ -1,5 +1,8 @@
 # Create Projects with Role
 
+<details>
+<summary><b>Solution</b></summary>
+<p>
 ## 1. Create an Argo CD Project Declaratively with the Following Specifications
 
 **Example Manifest:**
@@ -56,3 +59,6 @@ argocd app delete demo --grpc-web --auth-token TOKEN_VALUE
 ```
 
 📓 Deleting should be denied because the roles do not grant delete permission
+
+</p>
+</details>

@@ -1,5 +1,8 @@
 # Diff Customization (Ignore Differences for Deployment Replicas)
 
+<details>
+<summary><b>Solution</b></summary>
+<p>
 ## 1. Create an Argo CD Application Declaratively Using YAML with the Following Specifications
 
 ```yaml
@@ -62,3 +65,6 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 ```
 
 ## 7. Refresh the Application in Argo CD
+
+</p>
+</details>

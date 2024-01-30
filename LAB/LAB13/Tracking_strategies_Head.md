@@ -1,5 +1,8 @@
 # Tracking Strategies: Git Tag
 
+<details>
+<summary><b>Solution</b></summary>
+<p>
 ## 1. Create an Argo CD application declaratively using YAML with the following specifications
 
 **Example Manifest:**
@@ -44,3 +47,6 @@ kubectl get application -n argocd
 ```bash
 kubectl get all -n track-head
 ```
+
+</p>
+</details>

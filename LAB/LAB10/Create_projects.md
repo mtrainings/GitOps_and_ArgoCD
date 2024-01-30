@@ -1,5 +1,8 @@
 # Create Projects
 
+<details>
+<summary><b>Solution</b></summary>
+<p>
 ## 1. Create an Argo CD Project Declaratively with the Following Specifications
 
 **Example Manifest:**
@@ -104,3 +107,6 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 ```
 
 ## 9. Log in to UI and Click Sync
+
+</p>
+</details>

@@ -1,5 +1,8 @@
 # Use Private Git Repo Using HTTPS
 
+<details>
+<summary><b>Solution</b></summary>
+<p>
 ## 1. Create a Secret for Private Repo
 
 ```yaml
@@ -73,3 +76,6 @@ kubectl apply -f app.yaml -n argocd
 ```
 
 ## 8. Go to ArgoCD WebUI and Sync the Application
+
+</p>
+</details>
