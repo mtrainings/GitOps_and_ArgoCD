@@ -1,8 +1,11 @@
 # Directory of Files Options
 
+This exercise explores the options for managing a directory of files within Argo CD. Follow these steps:
+
 <details>
 <summary><b>Solution</b></summary>
 <p>
+
 ## 1. Create an Argo CD Application Declaratively Using YAML
 
 **Example Manifest:**

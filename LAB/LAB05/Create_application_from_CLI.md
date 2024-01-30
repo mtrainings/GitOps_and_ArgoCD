@@ -1,8 +1,11 @@
 # Creating Argo CD Application from CLI
 
+This exercise demonstrates the process of creating an Argo CD application using the Command-Line Interface (CLI). Follow these steps:
+
 <details>
 <summary><b>Solution</b></summary>
 <p>
+
 ## 1. Forward port for ArgoCD
 
 ```bash

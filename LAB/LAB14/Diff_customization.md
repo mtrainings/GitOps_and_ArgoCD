@@ -1,8 +1,11 @@
 # Diff Customization (Ignore Differences for Deployment Replicas)
 
+This exercise showcases how to customize Argo CD's diffing behavior to ignore differences in the number of replicas for a Deployment resource. Follow these steps:
+
 <details>
 <summary><b>Solution</b></summary>
 <p>
+
 ## 1. Create an Argo CD Application Declaratively Using YAML with the Following Specifications
 
 ```yaml

@@ -1,8 +1,11 @@
 # HELM in ArgoCD
 
+This exercise demonstrates the usage of Helm charts in Argo CD. Follow these steps:
+
 <details>
 <summary><b>Solution</b></summary>
 <p>
+
 ## 1. Create an Argo CD Application Declaratively Using YAML
 
 **Example Manifest:**

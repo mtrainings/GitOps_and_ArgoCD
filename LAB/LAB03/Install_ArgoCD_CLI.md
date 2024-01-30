@@ -1,8 +1,11 @@
 # Installing Argo CD CLI
 
+This exercise guides you through the installation and basic usage of the Argo CD Command-Line Interface (CLI). Follow these steps:
+
 <details>
 <summary><b>Solution</b></summary>
 <p>
+
 ## 1. Install Argo CD CLI using the following commands
 
 ```bash

@@ -1,5 +1,7 @@
 # Creating Argo CD Application Declaratively
 
+This exercise walks you through the process of creating an Argo CD application declaratively using YAML manifests. Follow these steps:
+
 <details>
 <summary><b>Solution</b></summary>
 <p>

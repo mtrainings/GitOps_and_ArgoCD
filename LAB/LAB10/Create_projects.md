@@ -1,8 +1,11 @@
 # Create Projects
 
+This exercise covers the creation of Argo CD projects and applications within those projects. Follow these steps:
+
 <details>
 <summary><b>Solution</b></summary>
 <p>
+
 ## 1. Create an Argo CD Project Declaratively with the Following Specifications
 
 **Example Manifest:**

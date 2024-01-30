@@ -1,8 +1,11 @@
 # Use Private Git Repo Using HTTPS
 
+This exercise demonstrates how to configure Argo CD to use a private Git repository with HTTPS. Follow these steps:
+
 <details>
 <summary><b>Solution</b></summary>
 <p>
+
 ## 1. Create a Secret for Private Repo
 
 ```yaml

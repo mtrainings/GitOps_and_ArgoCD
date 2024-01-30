@@ -1,8 +1,11 @@
 # Create Projects with Role
 
+This exercise demonstrates the creation of an Argo CD project with a specific role, followed by the creation of a token associated with that role. Follow these steps:
+
 <details>
 <summary><b>Solution</b></summary>
 <p>
+
 ## 1. Create an Argo CD Project Declaratively with the Following Specifications
 
 **Example Manifest:**

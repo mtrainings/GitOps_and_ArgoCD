@@ -1,8 +1,11 @@
 # Kustomize
 
+This exercise illustrates the use of Kustomize in Argo CD. Follow these steps:
+
 <details>
 <summary><b>Solution</b></summary>
 <p>
+
 ## 1. Create an Argo CD Application Declaratively with the Following Specifications
 
 **Example Manifest:**

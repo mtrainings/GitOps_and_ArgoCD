@@ -1,8 +1,11 @@
 # Tracking Strategies: Git Tag
 
+This exercise illustrates the use of a Git tag as a tracking strategy for Argo CD applications. Follow these steps:
+
 <details>
 <summary><b>Solution</b></summary>
 <p>
+
 ## 1. Create an Argo CD application declaratively using YAML with the following specifications
 
 **Example Manifest:**
