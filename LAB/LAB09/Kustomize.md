@@ -1,8 +1,16 @@
 # Kustomize
 
-1. Create an Argo CD application declaratively with below specs
-Example manifest:
-```
+This exercise illustrates the use of Kustomize in Argo CD. Follow these steps:
+
+<details>
+<summary><b>Solution</b></summary>
+<p>
+
+## 1. Create an Argo CD Application Declaratively with the Following Specifications
+
+**Example Manifest:**
+
+```yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata: 
@@ -21,22 +29,31 @@ spec:
     syncOptions:
       - CreateNamespace=true
 ```
-2. Apply this manifest with kubectl
-```
+
+## 2. Apply this Manifest with kubectl
+
+```bash
 kubectl apply -f kustomize.yaml -n argocd
 ```
-3. Verify app
-```
+
+## 3. Verify App
+
+```bash
 kubectl get application -n argocd
 ```
-4. Login into ArgoCD WebUI
-```
+
+## 4. Retrieve the admin password for ArgoCD WebUI
+
+```bash
 kubectl port-forward svc/argocd-server -n argocd 8080:443
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 ```
-5. Now login to UI and click Sync.
-6. Set name prefix staging- and common label app: demo options in Argo CD
-```
+
+## 5. Log in to UI and Click Sync
+
+## Set Name Prefix `staging-` and Common Label `app: demo` Options in Argo CD
+
+```yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata: 
@@ -59,12 +76,20 @@ spec:
     syncOptions:
       - CreateNamespace=true
 ```
-7. Apply this manifest with kubectl
-```
+
+## 7. Apply this Manifest with kubectl
+
+```bash
 kubectl apply -f kustomize.yaml -n argocd
 ```
-8. Verify app
-```
+
+## 8. Verify App
+
+```bash
 kubectl get application -n argocd
 ```
-9. Go to UI and click Re-Sync the application and select **prune** option to delete old resources **with old names**.
+
+## Go to UI and Click Re-Sync the Application and Select prune Option to Delete Old Resources with Old Names
+
+</p>
+</details>

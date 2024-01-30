@@ -1,6 +1,14 @@
-# Diff customization (Ignore differences for deployment replicas)
-1. Create an Argo CD application declaratively using Yaml with below specs
-```
+# Diff Customization (Ignore Differences for Deployment Replicas)
+
+This exercise showcases how to customize Argo CD's diffing behavior to ignore differences in the number of replicas for a Deployment resource. Follow these steps:
+
+<details>
+<summary><b>Solution</b></summary>
+<p>
+
+## 1. Create an Argo CD Application Declaratively Using YAML with the Following Specifications
+
+```yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata: 
@@ -25,27 +33,41 @@ spec:
     - group: apps
       kind: Deployment
       jsonPointers:
-      - /spec/replicas
+        - /spec/replicas
 ```
-2. Apply this manifest with kubectl
-```
+
+## 2. Apply this Manifest with kubectl
+
+```bash
 kubectl apply -f app.yaml -n argocd
 ```
-3. Verify app
-```
+
+## 3. Verify App
+
+```bash
 kubectl get application -n argocd
 ```
-4. Verify that resources created in diffing-customization-demo namespace
-```
+
+## 4. Verify that Resources are Created in diffing-customization-demo Namespace
+
+```bash
 kubectl get all -n diffing-customization-demo
 ```
-5. Scale the deployment into 3 replicas using kubectl
-```
+
+## 5. Scale the Deployment into 3 Replicas Using kubectl
+
+```bash
 kubectl scale deployment/guestbook-ui -n diffing-customization-demo --replicas=3
 ```
-6. Login into ArgoCD WebUI
-```
+
+## 6. Retrieve the admin password for ArgoCD WebUI
+
+```bash
 kubectl port-forward svc/argocd-server -n argocd 8080:443
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 ```
-7. Refresh the application in Argo CD.
+
+## 7. Refresh the Application in Argo CD
+
+</p>
+</details>

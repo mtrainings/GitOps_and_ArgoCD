@@ -1,18 +1,27 @@
 # Creating Argo CD Application Declaratively
-1. Create an Argo CD application declaratively using Yaml
-Example manifest:
-```
+
+This exercise walks you through the process of creating an Argo CD application declaratively using YAML manifests. Follow these steps:
+
+<details>
+<summary><b>Solution</b></summary>
+<p>
+
+## 1. Create an Argo CD application declaratively using YAML
+
+**Example manifest:**
+
+```yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
-metadata: 
+metadata:
   name: guestbook
   namespace: argocd
-spec: 
-  destination: 
+spec:
+  destination:
     namespace: guestbook
     server: "https://kubernetes.default.svc"
   project: default
-  source: 
+  source:
     path: guestbook
     repoURL: "https://github.com/spy86/argocd-example-apps.git"
     targetRevision: master
@@ -20,17 +29,27 @@ spec:
     syncOptions:
       - CreateNamespace=true
 ```
-2. Apply this manifest with kubectl
-```
+
+## 2. Apply this manifest with kubectl
+
+```bash
 kubectl apply -f app.yaml -n argocd
 ```
-3. Verify if app are deployed in ArgoCD
-```
+
+## 3. Verify if the app is deployed in ArgoCD
+
+```bash
 kubectl get application -n argocd
 ```
-4. Login into ArgoCD WebUI
-```
+
+## 4. Retrieve the admin password for ArgoCD WebUI
+
+```bash
 kubectl port-forward svc/argocd-server -n argocd 8080:443
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 ```
-4. Now login to UI and click Sync.
+
+## 5. Now log in to the UI and click Sync
+
+</p>
+</details>
