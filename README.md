@@ -42,13 +42,13 @@ Welcome to the ArgoCD Labs repository! These labs are designed to guide you thro
 11. [Create projects with role](LAB/LAB11/Create_projects_with_role.md)
     - Learn how to create projects with specific roles for access control.
 
-12. [Use private git repo using HTTPS/SSH](LAB/LAB12/Private_git_repo.md)
-12.1 [Use private git repo using HTTPS](LAB/LAB12/Private_git_repo_https.md)
+12. [Use private git repo using HTTPS/SSH](LAB/LAB12/Private_git_repo.md)\
+12.1 [Use private git repo using HTTPS](LAB/LAB12/Private_git_repo_https.md)\
 12.2 [Use private git repo using SSH](LAB/LAB12/Private_git_repo_ssh.md)
     - Configure ArgoCD to work with private Git repositories using HTTPS or SSH.
 
-13. [Tracking strategies Git tag/Git SHA](LAB/LAB13/Tracking_strategies.md)
-13.1 [Tracking strategies Git tag](LAB/Tracking_strategies_Git_Tag.md.md)
+13. [Tracking strategies Git tag/Git SHA](LAB/LAB13/Tracking_strategies.md)\
+13.1 [Tracking strategies Git tag](LAB/Tracking_strategies_Git_Tag.md.md)\
 13.2 [Tracking strategies Git SHA](LAB/Tracking_strategies_Head.md)
     - Understand different strategies for tracking changes using Git tags or Git SHAs.
 
