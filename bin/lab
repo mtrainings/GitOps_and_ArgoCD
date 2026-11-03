@@ -1,0 +1,242 @@
+#!/usr/bin/env bash
+# ParcelPal GitOps lab helper - run from anywhere:  ./bin/lab <command>
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ENV_DIR="$ROOT/env"
+WORK="$ROOT/work"
+set -a; . "$ENV_DIR/versions.env"; set +a
+GITEA_URL=http://gitea:3000
+REPO_URL="$GITEA_URL/$GITEA_USER/gitops.git"
+SUDO=""; [[ $(id -u) -ne 0 ]] && SUDO=sudo
+
+die()  { echo "ERROR: $*" >&2; exit 1; }
+info() { echo ">> $*"; }
+need() { for t in "$@"; do command -v "$t" >/dev/null || die "'$t' not found - run ./bin/lab tools"; done; }
+hub()  { kubectl --context kind-hub "$@"; }
+
+usage() {
+  cat <<EOF
+Usage: lab <command>
+
+  tools            install kind, kubectl, helm, argocd, kubeseal, kubectl-argo-rollouts (pinned versions)
+  up               create/start the "hub" cluster (+ Traefik) and Gitea
+  gitea-init       create the Gitea user and the "gitops" repository, clone it to ./work/gitops
+  install-argocd   install Argo CD with Helm (what LAB01 does by hand)
+  password         print the initial Argo CD admin password
+  login            log the argocd CLI in as admin
+  edge             create the second cluster "edge" (LAB09)
+  catchup <N>      bring the environment to the end state of LAB<N> (uses ./solutions)
+  breakfix         deploy the LAB12 break-fix scenarios
+  check            score the break-fix challenge
+  status           clusters, Gitea and Argo CD applications
+  down             stop all containers (state is kept)
+  destroy          delete clusters, Gitea and ./work (full reset)
+EOF
+}
+
+# ------------------------------------------------------------------ tools
+tools() {
+  local bin=/usr/local/bin tmp; tmp=$(mktemp -d)
+  info "installing CLI tools into $bin"
+  curl -fsSLo "$tmp/kind" "https://kind.sigs.k8s.io/dl/$KIND_VERSION/kind-linux-amd64"
+  curl -fsSLo "$tmp/kubectl" "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl"
+  curl -fsSL "https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz" | tar -xz -C "$tmp" --strip-components=1 linux-amd64/helm
+  curl -fsSLo "$tmp/argocd" "https://github.com/argoproj/argo-cd/releases/download/$ARGOCD_VERSION/argocd-linux-amd64"
+  curl -fsSL "https://github.com/bitnami-labs/sealed-secrets/releases/download/v$KUBESEAL_VERSION/kubeseal-$KUBESEAL_VERSION-linux-amd64.tar.gz" | tar -xz -C "$tmp" kubeseal
+  curl -fsSLo "$tmp/kubectl-argo-rollouts" "https://github.com/argoproj/argo-rollouts/releases/download/$ROLLOUTS_VERSION/kubectl-argo-rollouts-linux-amd64"
+  chmod +x "$tmp"/*
+  $SUDO install -m 0755 "$tmp"/* "$bin"/
+  rm -rf "$tmp"
+  for t in kind kubectl helm argocd kubeseal kubectl-argo-rollouts; do printf '  %-24s %s\n' "$t" "$(command -v $t)"; done
+}
+
+# ------------------------------------------------------------------ environment
+# gitea: the same Git URL works on the VM and in the cluster
+# argocd.localtest.me: force IPv4 - kind publishes ports on IPv4 only and the argocd CLI does not fall back
+hosts_entry() {
+  local h
+  for h in gitea argocd.localtest.me; do
+    grep -qE "^127\.0\.0\.1[[:space:]](.*[[:space:]])?$h([[:space:]]|$)" /etc/hosts && continue
+    info "adding '127.0.0.1 $h' to /etc/hosts"
+    echo "127.0.0.1 $h" | $SUDO tee -a /etc/hosts >/dev/null
+  done
+}
+
+# Pods use CoreDNS, not Docker's DNS - teach CoreDNS the current IP of the gitea container
+coredns_gitea() {
+  local ctx="kind-$1" ip cf
+  ip=$(docker inspect -f '{{(index .NetworkSettings.Networks "kind").IPAddress}}' gitops-gitea)
+  cf=$(kubectl --context "$ctx" -n kube-system get cm coredns -o jsonpath='{.data.Corefile}')
+  if grep -q '# gitea' <<<"$cf"; then
+    cf=$(sed -E "s/^( *)[0-9.]+ gitea # gitea/\1$ip gitea # gitea/" <<<"$cf")
+  else
+    cf=$(sed -E "0,/^\.:53 \{/s//.:53 {\n    hosts {\n       $ip gitea # gitea\n       fallthrough\n    }/" <<<"$cf")
+  fi
+  kubectl --context "$ctx" -n kube-system create cm coredns --from-literal=Corefile="$cf" \
+    --dry-run=client -o yaml | kubectl --context "$ctx" replace -f - >/dev/null
+  kubectl --context "$ctx" -n kube-system rollout restart deploy/coredns >/dev/null
+  kubectl --context "$ctx" -n kube-system rollout status deploy/coredns --timeout=90s >/dev/null
+}
+
+up() {
+  need docker kind kubectl helm
+  if kind get clusters 2>/dev/null | grep -qx hub; then
+    docker start hub-control-plane >/dev/null 2>&1 || true
+  else
+    kind create cluster --config "$ENV_DIR/kind-hub.yaml" --image "$KIND_NODE_IMAGE"
+  fi
+  docker ps -a --format '{{.Names}}' | grep -qx edge-control-plane && docker start edge-control-plane >/dev/null
+  info "Traefik ingress controller"
+  helm upgrade --install traefik traefik --repo https://traefik.github.io/charts --version "$TRAEFIK_CHART_VERSION" \
+    --kube-context kind-hub -n traefik --create-namespace -f "$ENV_DIR/traefik-values.yaml" --wait >/dev/null
+
+  info "Gitea"
+  if docker ps -a --format '{{.Names}}' | grep -qx gitops-gitea; then
+    docker start gitops-gitea >/dev/null
+  else
+    docker run -d --name gitops-gitea --network kind --network-alias gitea --restart unless-stopped \
+      -p 3000:3000 -p 2222:22 -v gitops-gitea-data:/data \
+      -e GITEA__security__INSTALL_LOCK=true \
+      -e GITEA__server__ROOT_URL=$GITEA_URL/ -e GITEA__server__DOMAIN=gitea \
+      -e GITEA__server__SSH_DOMAIN=gitea -e GITEA__server__SSH_PORT=22 \
+      -e GITEA__service__DISABLE_REGISTRATION=true \
+      -e GITEA__webhook__ALLOWED_HOST_LIST='*' \
+      "$GITEA_IMAGE" >/dev/null
+  fi
+  hosts_entry
+  for _ in $(seq 1 60); do curl -fs "$GITEA_URL/api/healthz" >/dev/null && break; sleep 2; done
+  curl -fs "$GITEA_URL/api/healthz" >/dev/null || die "Gitea did not start - docker logs gitops-gitea"
+  coredns_gitea hub
+  echo
+  echo "hub cluster : kubectl --context kind-hub get nodes"
+  echo "Gitea       : $GITEA_URL   ($GITEA_USER / $GITEA_PASSWORD)"
+  echo "Argo CD     : http://argocd.localtest.me   (after LAB01)"
+}
+
+gitea_init() {
+  if curl -fs "$GITEA_URL/api/v1/users/$GITEA_USER" >/dev/null; then
+    info "user $GITEA_USER exists"
+  else
+    docker exec -u git gitops-gitea gitea admin user create --username "$GITEA_USER" --password "$GITEA_PASSWORD" \
+      --email "$GITEA_USER@parcelpal.local" --admin --must-change-password=false >/dev/null
+    info "user $GITEA_USER created"
+  fi
+  curl -fs -u "$GITEA_USER:$GITEA_PASSWORD" -X POST "$GITEA_URL/api/v1/user/repos" -H 'Content-Type: application/json' \
+    -d '{"name":"gitops","default_branch":"main","description":"ParcelPal desired state"}' >/dev/null \
+    && info "repository gitops created" || info "repository gitops exists"
+  mkdir -p "$WORK"
+  if [[ ! -d "$WORK/gitops/.git" ]]; then
+    cp -r "$ROOT/seed/gitops" "$WORK/gitops"
+    ( cd "$WORK/gitops" && git init -q -b main \
+      && git config user.name "ParcelPal Dev" && git config user.email dev@parcelpal.local \
+      && git add -A && git commit -qm "Initial import" \
+      && git remote add origin "http://$GITEA_USER:$GITEA_PASSWORD@gitea:3000/$GITEA_USER/gitops.git" \
+      && git push -q -u origin main )
+  fi
+  echo "repository: $GITEA_URL/$GITEA_USER/gitops   working copy: $WORK/gitops"
+}
+
+install_argocd() {
+  need helm kubectl
+  helm upgrade --install argocd argo-cd --repo https://argoproj.github.io/argo-helm --version "$ARGOCD_CHART_VERSION" \
+    --kube-context kind-hub -n argocd --create-namespace -f "$ENV_DIR/argocd-values.yaml" --wait
+  hub -n argocd rollout status deploy/argocd-server --timeout=180s
+  for _ in $(seq 1 60); do curl -fsk https://argocd.localtest.me/api/version >/dev/null && return 0; sleep 2; done
+  die "Argo CD API does not answer - kubectl -n argocd get pods"
+}
+
+ADMIN_PASSWORD_LAB='ParcelPal-Admin-2026!'      # the password LAB01 asks you to set
+
+password() { argocd admin initial-password -n argocd --kube-context kind-hub 2>/dev/null | head -n1 \
+             || die "no initial password any more - you changed it in LAB01 ($ADMIN_PASSWORD_LAB)"; }
+
+login() {
+  need argocd
+  local pw=${ARGOCD_PASSWORD:-}
+  [[ -z $pw ]] && pw=$(argocd admin initial-password -n argocd --kube-context kind-hub 2>/dev/null | head -n1 || true)
+  [[ -z $pw ]] && pw=$ADMIN_PASSWORD_LAB
+  for _ in 1 2 3 4 5; do        # the API may still be restarting after a helm upgrade
+    argocd login argocd.localtest.me --grpc-web --insecure --username admin --password "$pw" && return 0
+    sleep 5
+  done
+  return 1
+}
+
+edge() {
+  need kind
+  if ! kind get clusters 2>/dev/null | grep -qx edge; then
+    kind create cluster --config "$ENV_DIR/kind-edge.yaml" --image "$KIND_NODE_IMAGE"
+  fi
+  kubectl config use-context kind-hub >/dev/null
+  echo "edge cluster ready - contexts: kind-hub (current), kind-edge"
+}
+
+# ------------------------------------------------------------------ catch-up
+# solutions/LABnn/ may contain:
+#   repo/     files copied into work/gitops, then committed and pushed
+#   remove    paths (one per line) deleted from work/gitops before the commit
+#   run.sh    commands run afterwards (cwd = work/gitops)
+apply_solution() {
+  local n; n=$(printf '%02d' "$1"); local d="$ROOT/solutions/LAB$n"
+  [[ -d $d ]] || return 0
+  info "LAB$n"
+  if [[ -d $d/repo || -f $d/remove ]]; then
+    [[ -d $d/repo ]] && cp -r "$d/repo/." "$WORK/gitops/"
+    [[ -f $d/remove ]] && ( cd "$WORK/gitops" && xargs -r rm -rf < "$d/remove" )
+    ( cd "$WORK/gitops" && git add -A && { git diff --cached --quiet || git commit -qm "Catch up: LAB$n"; } && git push -q )
+  fi
+  if [[ -f $d/run.sh ]]; then
+    ( cd "$WORK/gitops" && ROOT="$ROOT" WORK="$WORK" LAB="$ROOT/bin/lab" bash -euo pipefail "$d/run.sh" )
+  fi
+  return 0
+}
+
+catchup() {
+  local n="${1:?lab number}"
+  [[ -d "$WORK/gitops/.git" ]] || gitea_init
+  for i in $(seq 1 "$n"); do apply_solution "$i"; done
+  echo "environment is at the end of LAB$(printf '%02d' "$n")"
+}
+
+# ------------------------------------------------------------------ break-fix
+breakfix() { ROOT="$ROOT" WORK="$WORK" bash "$ROOT/break-fix/deploy.sh"; }
+check()    { bash "$ROOT/break-fix/check.sh"; }
+
+status() {
+  kind get clusters 2>/dev/null | sed 's/^/cluster: /'
+  docker ps --filter name=gitops-gitea --format 'gitea:   {{.Status}}'
+  kubectl --context kind-hub get applications -A 2>/dev/null || echo "Argo CD not installed yet"
+}
+
+down() {
+  docker stop gitops-gitea hub-control-plane edge-control-plane >/dev/null 2>&1 || true
+  echo "stopped - ./bin/lab up starts everything again"
+}
+
+destroy() {
+  kind delete cluster --name edge >/dev/null 2>&1 || true
+  kind delete cluster --name hub >/dev/null 2>&1 || true
+  docker rm -f gitops-gitea >/dev/null 2>&1 || true
+  docker volume rm gitops-gitea-data >/dev/null 2>&1 || true
+  rm -rf "$WORK"
+  echo "everything removed"
+}
+
+case "${1:-help}" in
+  tools)          tools ;;
+  up)             up ;;
+  gitea-init)     gitea_init ;;
+  install-argocd) install_argocd ;;
+  password)       password ;;
+  login)          login ;;
+  edge)           edge ;;
+  catchup)        catchup "${2:-}" ;;
+  solution)       apply_solution "${2:?lab number}" ;;      # one lab only (instructor / smoke test)
+  breakfix)       breakfix ;;
+  check)          check ;;
+  status)         status ;;
+  down)           down ;;
+  destroy)        destroy ;;
+  *)              usage ;;
+esac

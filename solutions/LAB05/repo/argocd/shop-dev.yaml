@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: shop-dev
+  namespace: argocd
+spec:
+  project: parcelpal
+  source:
+    repoURL: http://gitea:3000/student/gitops.git
+    targetRevision: main
+    path: apps/shop/overlays/dev          # Argo CD detects kustomization.yaml -> Kustomize
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: shop-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

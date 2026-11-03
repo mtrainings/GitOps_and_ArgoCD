@@ -1,0 +1,62 @@
+# Argo CD Helm values for the lab - state after LAB10 (local user + RBAC + notifications)
+global:
+  domain: argocd.localtest.me
+
+configs:
+  params:
+    server.insecure: true            # TLS would end at the ingress - plain HTTP is fine for the lab
+  cm:
+    timeout.reconciliation: 60s      # how often Argo CD polls Git (lab: every minute)
+    accounts.alice: login            # local user for the UI and CLI
+  rbac:
+    policy.default: ""               # no access unless granted below
+    policy.csv: |
+      p, role:parcelpal-dev, applications, get,  parcelpal/*, allow
+      p, role:parcelpal-dev, applications, sync, parcelpal/*, allow
+      p, role:parcelpal-dev, logs,         get,  parcelpal/*, allow
+      p, role:parcelpal-dev, projects,     get,  parcelpal,   allow
+      g, alice, role:parcelpal-dev
+
+server:
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    extraRules:                      # webhook endpoint for Gitea, reachable without the host name (LAB03)
+      - http:
+          paths:
+            - path: /api/webhook
+              pathType: Prefix
+              backend:
+                service:
+                  name: argocd-server
+                  port:
+                    name: http
+
+notifications:
+  notifiers:
+    service.webhook.chat: |
+      url: http://chat.chat.svc
+      headers:
+        - name: Content-Type
+          value: application/json
+  templates:
+    template.app-synced: |
+      webhook:
+        chat:
+          method: POST
+          body: |
+            {"text": ":white_check_mark: {{.app.metadata.name}} synced to {{.app.status.sync.revision | trunc 7}}"}
+    template.app-degraded: |
+      webhook:
+        chat:
+          method: POST
+          body: |
+            {"text": ":red_circle: {{.app.metadata.name}} is {{.app.status.health.status}}"}
+  triggers:
+    trigger.on-sync-succeeded: |
+      - when: app.status.operationState != nil and app.status.operationState.phase in ['Succeeded']
+        oncePer: app.status.sync.revision
+        send: [app-synced]
+    trigger.on-health-degraded: |
+      - when: app.status.health.status == 'Degraded'
+        send: [app-degraded]

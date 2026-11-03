@@ -1,0 +1,35 @@
+# One Application per folder in apps/shop/overlays/ - add a folder, get an environment
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: shop
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: http://gitea:3000/student/gitops.git
+        revision: main
+        directories:
+          - path: apps/shop/overlays/*
+  template:
+    metadata:
+      name: 'shop-{{.path.basename}}'
+      labels:
+        parcelpal/env: '{{.path.basename}}'
+    spec:
+      project: parcelpal
+      source:
+        repoURL: http://gitea:3000/student/gitops.git
+        targetRevision: main
+        path: '{{.path.path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'shop-{{.path.basename}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

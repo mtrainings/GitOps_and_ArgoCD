@@ -1,0 +1,18 @@
+# Traefik as the ingress controller of the "hub" cluster (installed by ./bin/lab up)
+service:
+  type: NodePort
+ports:
+  web:
+    nodePort: 30080
+  websecure:
+    nodePort: 30443
+ingressClass:
+  enabled: true
+  isDefaultClass: true
+providers:
+  kubernetesIngress:
+    publishedService:
+      enabled: false
+# write an address into Ingress status - Argo CD reports an Ingress as Healthy only when it has one
+additionalArguments:
+  - --providers.kubernetesingress.ingressendpoint.ip=127.0.0.1

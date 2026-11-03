@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bf6
+  namespace: argocd
+spec:
+  project: breakfix
+  source:
+    repoURL: http://gitea:3000/student/breakfix.git
+    targetRevision: main
+    path: bf6
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: bf-6
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

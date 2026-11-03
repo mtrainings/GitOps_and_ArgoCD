@@ -1,0 +1,14 @@
+# Gives the local cluster ("in-cluster") a label, so cluster generators can select it.
+# No credentials inside - Argo CD uses its own service account for in-cluster.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cluster-in-cluster
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: cluster
+    env: hub
+stringData:
+  name: in-cluster
+  server: https://kubernetes.default.svc
+  config: '{"tlsClientConfig":{"insecure":false}}'

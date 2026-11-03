@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tracker
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io     # deleting the app also deletes its resources
+spec:
+  project: default
+  source:
+    repoURL: http://gitea:3000/student/gitops.git
+    targetRevision: main
+    path: apps/tracker
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tracker
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

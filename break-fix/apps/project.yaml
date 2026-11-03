@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: breakfix
+  namespace: argocd
+spec:
+  description: LAB12 break-fix challenge
+  sourceRepos:
+    - http://gitea:3000/student/breakfix.git
+    - http://gitea:3000/finance/ledger.git
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: bf-*
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
