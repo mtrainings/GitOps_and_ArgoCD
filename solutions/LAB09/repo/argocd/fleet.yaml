@@ -1,0 +1,39 @@
+# One Application per cluster labelled env=hub or env=edge
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: fleet
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - clusters:
+        selector:
+          matchExpressions:
+            - key: env
+              operator: In
+              values: [hub, edge]
+  template:
+    metadata:
+      name: 'fleet-{{.name}}'
+    spec:
+      project: parcelpal
+      source:
+        repoURL: https://stefanprodan.github.io/podinfo
+        chart: podinfo
+        targetRevision: 6.17.0
+        helm:
+          releaseName: depot
+          valuesObject:
+            ui:
+              message: 'ParcelPal depot app on cluster {{.name}}'
+      destination:
+        server: '{{.server}}'
+        namespace: fleet
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

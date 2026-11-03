@@ -1,0 +1,33 @@
+# Argo CD Helm values for the lab - state after LAB05 (local user + RBAC)
+global:
+  domain: argocd.localtest.me
+
+configs:
+  params:
+    server.insecure: true            # TLS would end at the ingress - plain HTTP is fine for the lab
+  cm:
+    timeout.reconciliation: 60s      # how often Argo CD polls Git (lab: every minute)
+    accounts.alice: login            # local user for the UI and CLI
+  rbac:
+    policy.default: ""               # no access unless granted below
+    policy.csv: |
+      p, role:parcelpal-dev, applications, get,  parcelpal/*, allow
+      p, role:parcelpal-dev, applications, sync, parcelpal/*, allow
+      p, role:parcelpal-dev, logs,         get,  parcelpal/*, allow
+      p, role:parcelpal-dev, projects,     get,  parcelpal,   allow
+      g, alice, role:parcelpal-dev
+
+server:
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    extraRules:                      # webhook endpoint for Gitea, reachable without the host name (LAB03)
+      - http:
+          paths:
+            - path: /api/webhook
+              pathType: Prefix
+              backend:
+                service:
+                  name: argocd-server
+                  port:
+                    name: http

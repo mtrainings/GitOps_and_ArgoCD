@@ -1,0 +1,17 @@
+# Values for the "status" page (podinfo Helm chart) - LAB04
+replicaCount: 1
+ui:
+  message: "ParcelPal status - all systems operational"
+  color: "#4682b4"
+ingress:
+  enabled: true
+  className: traefik
+  hosts:
+    - host: status.localtest.me
+      paths:
+        - path: /
+          pathType: Prefix
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi

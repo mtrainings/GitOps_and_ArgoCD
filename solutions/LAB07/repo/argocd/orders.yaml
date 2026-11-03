@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: orders
+  namespace: argocd
+spec:
+  project: parcelpal
+  source:
+    repoURL: http://gitea:3000/student/gitops.git
+    targetRevision: main
+    path: apps/orders
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: orders
+  ignoreDifferences:                       # the number of replicas is owned by people/autoscalers, not Git
+    - group: apps
+      kind: Deployment
+      name: orders
+      jsonPointers:
+        - /spec/replicas
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - RespectIgnoreDifferences=true      # also keep the live value when syncing
+      - ServerSideApply=true

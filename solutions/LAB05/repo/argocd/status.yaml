@@ -1,0 +1,28 @@
+# Helm chart from a Helm repository + values file from our Git repository (multiple sources)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: status
+  namespace: argocd
+spec:
+  project: parcelpal
+  sources:
+    - repoURL: https://stefanprodan.github.io/podinfo
+      chart: podinfo
+      targetRevision: 6.17.0
+      helm:
+        releaseName: status
+        valueFiles:
+          - $values/helm/status-values.yaml
+    - repoURL: http://gitea:3000/student/gitops.git
+      targetRevision: main
+      ref: values                          # makes the repo available as $values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: status
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

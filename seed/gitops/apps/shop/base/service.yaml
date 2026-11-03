@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: shop
+spec:
+  selector:
+    app.kubernetes.io/name: shop
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+labels:
+  - pairs:
+      parcelpal/env: dev
+replicas:
+  - name: shop
+    count: 1
+patches:
+  - target:
+      kind: Ingress
+      name: shop
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: shop-dev.localtest.me
+  - target:
+      kind: Deployment
+      name: shop
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "ParcelPal shop - dev"
+      - op: replace
+        path: /spec/template/spec/containers/0/env/1/value
+        value: "#d2691e"

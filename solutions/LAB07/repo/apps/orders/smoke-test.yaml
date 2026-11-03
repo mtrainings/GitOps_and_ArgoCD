@@ -1,0 +1,17 @@
+# Runs after the app is synced and healthy - fails the sync if the service does not answer
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: orders-smoke-test
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: smoke
+          image: curlimages/curl:8.11.1
+          command: ["sh", "-c", "curl -fsS http://orders/healthz && curl -fsS -X POST -d 'parcel-42' http://orders/cache/smoke && curl -fsS http://orders/cache/smoke"]

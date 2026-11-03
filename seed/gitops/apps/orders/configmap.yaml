@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: orders-config
+data:
+  PODINFO_UI_MESSAGE: "ParcelPal orders"
+  PODINFO_UI_COLOR: "#8b4513"

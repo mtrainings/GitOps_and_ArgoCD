@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tracker
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: parcelpal
+  source:
+    repoURL: http://gitea:3000/student/gitops.git
+    targetRevision: main
+    path: apps/tracker
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tracker
+  syncPolicy:
+    automated:
+      prune: true          # delete what was removed from Git
+      selfHeal: true       # undo manual changes in the cluster
+    syncOptions:
+      - CreateNamespace=true

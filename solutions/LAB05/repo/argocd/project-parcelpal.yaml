@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: parcelpal
+  namespace: argocd
+spec:
+  description: ParcelPal applications
+  sourceRepos:                                   # where manifests may come from
+    - http://gitea:3000/student/*
+    - https://stefanprodan.github.io/podinfo
+  destinations:                                  # where they may go
+    - server: https://kubernetes.default.svc
+      namespace: tracker
+    - server: https://kubernetes.default.svc
+      namespace: shop-*
+    - server: https://kubernetes.default.svc
+      namespace: status
+    - server: https://kubernetes.default.svc
+      namespace: orders
+    - server: https://kubernetes.default.svc
+      namespace: checkout
+  clusterResourceWhitelist:                      # cluster-scoped kinds allowed: only namespaces
+    - group: ""
+      kind: Namespace
+  namespaceResourceBlacklist:                    # teams may not touch quotas and limits
+    - group: ""
+      kind: ResourceQuota
+    - group: ""
+      kind: LimitRange
+  roles:
+    - name: ci
+      description: CI pipelines may sync, nothing else
+      policies:
+        - p, proj:parcelpal:ci, applications, get, parcelpal/*, allow
+        - p, proj:parcelpal:ci, applications, sync, parcelpal/*, allow

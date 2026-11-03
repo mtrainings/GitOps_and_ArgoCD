@@ -1,0 +1,41 @@
+# "chat": a tiny HTTP receiver that prints every request it gets - stands in for Slack/Teams in LAB10
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: chat
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: chat
+    spec:
+      containers:
+        - name: chat
+          image: mendhak/http-https-echo:38
+          env:
+            - name: HTTP_PORT
+              value: "8080"
+            - name: LOG_IGNORE_PATH
+              value: /healthz
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests: { cpu: 10m, memory: 32Mi }
+            limits: { memory: 128Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat
+spec:
+  selector:
+    app.kubernetes.io/name: chat
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

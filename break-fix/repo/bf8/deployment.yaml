@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracking-api
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 60
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tracking-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tracking-api
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/stefanprodan/podinfo
+          ports:
+            - containerPort: 9898
+          readinessProbe:
+            httpGet: { path: /readyz, port: 9898 }
+          resources:
+            requests: { cpu: 5m, memory: 24Mi }
+            limits: { memory: 64Mi }

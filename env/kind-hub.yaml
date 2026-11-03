@@ -1,0 +1,10 @@
+# "hub" cluster: Argo CD and most workloads. Traefik listens on NodePorts 30080/30443,
+# published on the VM as ports 80/443 - so http://<anything>.localtest.me reaches the cluster.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: hub
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - { containerPort: 30080, hostPort: 80, protocol: TCP }
+      - { containerPort: 30443, hostPort: 443, protocol: TCP }

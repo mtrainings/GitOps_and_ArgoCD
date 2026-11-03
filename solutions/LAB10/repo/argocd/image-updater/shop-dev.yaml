@@ -1,0 +1,20 @@
+# Keep shop-dev on the newest podinfo 6.x - and record every bump as a commit in Git
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: shop-dev
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: shop-dev
+      images:
+        - alias: shop
+          imageName: ghcr.io/stefanprodan/podinfo:6.x       # semver constraint
+          commonUpdateSettings:
+            updateStrategy: semver
+      writeBackConfig:
+        method: git:secret:git-creds
+        gitConfig:
+          repository: ssh://git@gitea/student/gitops.git    # write-back needs SSH or HTTPS
+          branch: main
+          writeBackTarget: kustomization
